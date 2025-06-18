@@ -47,12 +47,27 @@ ssize_t len_words(WordCount *wchead) {
      this function.
   */
     size_t len = 0;
+    WordCount *wc = wchead;
+    while(wc != NULL){
+      wc = (*wc)->next;
+      len++;
+    }
     return len;
 }
 
 WordCount *find_word(WordCount *wchead, char *word) {
   /* Return count for word, if it exists */
-  WordCount *wc = NULL;
+  WordCount *wc = wchead;
+  char *word_lower[MAX_WORD_LEN];
+  for( int i = 0; word[i]; i++){
+    word_lower[i] = tolower(word[i]);
+  }
+  while(wc != NULL){
+    if(strcmp(word_lower,(*wc)->word) == 0){
+          break;
+        }
+    wc = (*wc)->next;
+  }
   return wc;
 }
 
@@ -61,6 +76,27 @@ int add_word(WordCount **wclist, char *word) {
      Otherwise insert with count 1.
      Returns 0 if no errors are encountered in the body of this function; 1 otherwise.
   */
+  WordCount *wc = find_word(*wclist,word);
+  if( wc != NULL){
+    // word is present in list
+    (*wc)->count++;
+  }
+  else{
+    // word not present in list
+    // inserting word at begining of list
+    WordCount *new_wc = (WordCount *)malloc(sizeof(WordCount));
+    if( new_wc == NULL){
+      return 1;
+    }
+    (*new_wc)->word = new_string(word);
+    if( (*new_wc)->word == NULL){
+      free(new_wc);
+      return 1;
+    }
+    (*new_wc)->count = 1;
+    (*new_wc)->next = (**wclist);
+    (**wclist) = new_wc;
+  }
  return 0;
 }
 
